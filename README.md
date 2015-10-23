@@ -7,6 +7,6 @@ Add TestRail settings to config.json file.
 
 
 #NOTE!
-For use this reporter you need use moonkaker framework for your tests.
+For use this reporter you need use moonraker framework for your tests.
 Based on spec reporter.
 
