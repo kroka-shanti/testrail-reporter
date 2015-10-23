@@ -2,7 +2,7 @@
 
 This reporter update test suites in TestRail using features files. And then add results for each case.
 
-#CONFIG
+#Config
 Add TestRail settings to config.json file.
 
 
