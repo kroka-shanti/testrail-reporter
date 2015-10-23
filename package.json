@@ -1,0 +1,39 @@
+{
+  "name": "testrail-reporter",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kroka-shanti/testrail-reporter.git"
+  },
+  "keywords": [
+    "testrail",
+    "reporter",
+    "moonraker",
+    "mocha",
+    "spec"
+  ],
+  "author": {
+    "name": "kroka-shanti",
+    "email": "kroka-shanti@yandex.ru"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "test-console": "^1.0.0"
+  },
+  "dependencies": {
+    "async": "^1.4.2",
+    "lodash": "^3.1.0",
+    "mocha": "^2.2.5",
+    "node-testrail": "0.0.5"
+  },
+  "bugs": {
+    "url": "https://github.com/kroka-shanti/testrail-reporter/issues"
+  },
+  "_npmUser": {
+    "name": "kroka-shanti",
+    "email": "kroka-shanti@yandex.ru"
+  },
+  "analyze": true,
+  "homepage": "https://github.com/kroka-shanti/testrail-reporter"
+}
