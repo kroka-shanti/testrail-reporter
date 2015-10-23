@@ -5,7 +5,7 @@
 var TestRail = require('node-testrail');
 var async = require('async');
 var _ = require('lodash');
-var config = require('./config');
+var config = require('moonraker').config.testrailReporter;
 var testrail = new TestRail(config.url, config.username, config.password);
 var projectId = config.projectID;
 
