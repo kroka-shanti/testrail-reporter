@@ -121,7 +121,11 @@ function testrailreporter(runner) {
     }
   });
 
-  runner.on('end', self.epilogue.bind(self));
+  runner.on('end', function () {
+    console.log('View results:', testRailApi.getProjectRunsUrl());
+    self.epilogue();
+  });
+
 }
 
 /**

@@ -116,6 +116,10 @@ module.exports = {
     testrail.closeRun(currentRun.id, function (res) {
       callback();
     })
+  },
+
+  getProjectRunsUrl: function () {
+    return config.url + 'index.php?/runs/overview/' + projectId;
   }
 };
 
