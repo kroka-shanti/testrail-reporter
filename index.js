@@ -8,6 +8,8 @@ var Base = require('mocha').reporters.Base
 var testRailApi = require('./testRailApi');
 var session = require('moonraker').session;
 
+var skipTests = false;
+
 /**
  * Expose `testrailreporter`.
  */
@@ -48,7 +50,7 @@ function testrailreporter(runner) {
       });
       session.getDriver().wait( function () {
         return finish;
-      })
+      });
     }
     ++indents;
     console.log(color('suite', '%s%s'), indent(), suite.title);
@@ -57,7 +59,10 @@ function testrailreporter(runner) {
 
   runner.on('suite end', function(suite){
     --indents;
-    if (1 == indents) console.log();
+    if (1 == indents) {
+      console.log();
+      skipTests = false;
+    }
   });
 
   runner.on('pending', function(test){
@@ -81,33 +86,39 @@ function testrailreporter(runner) {
       cursor.CR();
       console.log(fmt, test.title, test.duration);
     }
-
-    var finish = false;
-    var status;
-    if (test.duration !== 0) {
-      status = '1'; //passed
-    } else {
-      status = '2'; //blocked (skiped)
+    if (!skipTests) {
+      var finish = false;
+      var status;
+      if (test.duration !== 0) {
+        status = '1'; //passed
+      } else {
+        status = '2'; //blocked (skiped)
+      }
+      testRailApi.addResult(test.title, status, null, test.duration, function () {
+        finish = true;
+      });
+      session.getDriver().wait( function () {
+        return finish;
+      });
     }
-    testRailApi.addResult(test.title, status, null, test.duration, function () {
-      finish = true;
-    });
-    session.getDriver().wait( function () {
-      return finish;
-    });
   });
 
   runner.on('fail', function(test, err){
+
     cursor.CR();
     console.log(indent() + color('fail', '  %d) %s'), ++n, test.title);
 
-    var finish = false;
-    testRailApi.addResult(test.title, '5', err.stack, null, function () {
-      finish = true;
-    });
-    session.getDriver().wait( function () {
-      return finish;
-    });
+    if (test.err.code !== 13) {
+      var finish = false;
+      testRailApi.addResult(test.title, '5', err.stack, null, function () {
+        finish = true;
+      });
+      session.getDriver().wait( function () {
+        return finish;
+      });
+    } else {
+      skipTests = true; //flag - miss all steps in section in pass method
+    }
   });
 
   runner.on('end', self.epilogue.bind(self));
