@@ -10,7 +10,8 @@ Add TestRail settings to config.json in your tests folder. For example:
     "url": "https://myproject.testrail.net/",
     "username": "username@myproject.com",
     "password": "password",
-    "projectID": "6"
+    "projectID": "6",
+    "milestone": ""
   }
 ```
 
