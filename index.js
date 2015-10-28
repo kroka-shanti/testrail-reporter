@@ -9,6 +9,7 @@ var testRailApi = require('./testRailApi');
 var session = require('moonraker').session;
 
 var skipTests = false;
+var scenarioStatus = 'passed';
 
 /**
  * Expose `testrailreporter`.
@@ -50,7 +51,7 @@ function testrailreporter(runner) {
       });
       session.getDriver().wait( function () {
         return finish;
-      });
+      }, 100000);
     }
     ++indents;
     console.log(color('suite', '%s%s'), indent(), suite.title);
@@ -63,6 +64,9 @@ function testrailreporter(runner) {
       console.log();
       skipTests = false;
     }
+    if (2 == indents) {
+      scenarioStatus = 'passed';
+    }
   });
 
   runner.on('pending', function(test){
@@ -71,6 +75,23 @@ function testrailreporter(runner) {
   });
 
   runner.on('pass', function(test){
+
+    if (!skipTests) {
+      var finish = false;
+      var status;
+      if (scenarioStatus === 'passed') {
+        status = '1'; //passed
+      } else {
+        status = '2'; //blocked (skiped)
+      }
+
+      testRailApi.addResult(test.parent.title, test.title, status, null, test.duration, function () {
+        finish = true;
+      });
+      session.getDriver().wait( function () {
+        return finish;
+      }, 20000);
+    }
 
     if ('fast' == test.speed) {
       var fmt = indent()
@@ -86,43 +107,29 @@ function testrailreporter(runner) {
       cursor.CR();
       console.log(fmt, test.title, test.duration);
     }
-    if (!skipTests) {
-      var finish = false;
-      var status;
-      if (test.duration !== 0) {
-        status = '1'; //passed
-      } else {
-        status = '2'; //blocked (skiped)
-      }
-      testRailApi.addResult(test.title, status, null, test.duration, function () {
-        finish = true;
-      });
-      session.getDriver().wait( function () {
-        return finish;
-      });
-    }
   });
 
   runner.on('fail', function(test, err){
 
-    cursor.CR();
-    console.log(indent() + color('fail', '  %d) %s'), ++n, test.title);
-
-    if (test.err.code !== 13) {
+    if (test.err.code !== 13) { //when test failed before start
+      scenarioStatus = 'failed';
       var finish = false;
-      testRailApi.addResult(test.title, '5', err.stack, null, function () {
+      testRailApi.addResult(test.parent.title, test.title, '5', err.stack, null, function () {
         finish = true;
       });
       session.getDriver().wait( function () {
         return finish;
-      });
+      }, 20000);
     } else {
       skipTests = true; //flag - miss all steps in section in pass method
     }
+
+    cursor.CR();
+    console.log(indent() + color('fail', '  %d) %s'), ++n, test.title);
   });
 
   runner.on('end', function () {
-    console.log('View results:', testRailApi.getProjectRunsUrl());
+    console.log('View results:', testRailApi.getViewResultsUrl());
     self.epilogue();
   });
 
